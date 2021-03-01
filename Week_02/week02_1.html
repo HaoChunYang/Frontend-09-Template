@@ -8,25 +8,24 @@
   <style>
     .cell {
       display: inline-block;
-      line-height: 7px;
       height: 6px;
       width: 6px;
       border-bottom: solid 1px grey;
       border-right: solid 1px grey;
       vertical-align: top;
-      background-color: red;
     }
     #container {
       width: 701px;
+      line-height: 7px;
     }
   </style>
 </head>
 <body>
-  <div id="container">
-
-  </div>
+  <div id="container"></div>
+  <button onclick="localStorage.setItem('map', JSON.stringify(map))">保存</button>
+  <button onclick="localStorage.removeItem('map')">清除</button>
   <script>
-    let map = Array(10000).fill(0)
+    let map = JSON.parse(localStorage.getItem('map')) ? JSON.parse(localStorage.getItem('map')) : Array(10000).fill(0)
 
     let mapView = document.getElementById('container')
 
@@ -41,10 +40,10 @@
         cell.addEventListener('mousemove', () => {
           if (mousedown) {
             cell.style.backgroundColor = 'black'
-            map[100 * j + i] = 1
+            map[100 * i + j] = 1
           } else {
             cell.style.backgroundColor = ''
-            map[100 * j + i] = 0
+            map[100 * i + j] = 0
           }
         })
 
