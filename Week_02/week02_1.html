@@ -5,8 +5,65 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    .cell {
+      display: inline-block;
+      line-height: 7px;
+      height: 6px;
+      width: 6px;
+      border-bottom: solid 1px grey;
+      border-right: solid 1px grey;
+      vertical-align: top;
+      background-color: red;
+    }
+    #container {
+      width: 701px;
+    }
+  </style>
 </head>
 <body>
-  
+  <div id="container">
+
+  </div>
+  <script>
+    let map = Array(10000).fill(0)
+
+    let mapView = document.getElementById('container')
+
+    for (let i = 0; i < 100; i++) {
+      for (let j = 0; j < 100; j++) {
+        let cell = document.createElement('div')
+        cell.classList.add('cell')
+        if (map[100 * i + j] === 1) {
+          cell.style.backgroundColor = 'black'
+        }
+
+        cell.addEventListener('mousemove', () => {
+          if (mousedown) {
+            cell.style.backgroundColor = 'black'
+            map[100 * j + i] = 1
+          } else {
+            cell.style.backgroundColor = ''
+            map[100 * j + i] = 0
+          }
+        })
+
+        mapView.appendChild(cell)
+      }
+    }
+
+    let mousedown = false
+    let clear = false
+    document.addEventListener('mousedown', (e) => {
+      mousedown = true
+      clear = (e.which === 3) // 右键点击，清除
+    })
+
+    document.addEventListener('mouseup', () => {
+      mousedown = false
+    })
+
+    document.addEventListener('contextmenu', e => e.preventDefault())
+  </script>
 </body>
 </html>
