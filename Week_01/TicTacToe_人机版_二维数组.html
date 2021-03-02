@@ -65,13 +65,13 @@
         console.log(pattern)
         console.log(color === 2 ? '⚫️ will winner !' : '⚪️ will winner !')
       }
-      pcMove(pattern, color)
+      pcMove()
     }
 
-    function pcMove (pattern, color) {
+    function pcMove () {
       let best = bestChoice(pattern, color).point
       pattern[best[0]][best[1]] = color
-      console.log('pc pattern = ', pattern)
+      console.log('pc pattern = ', pattern, best)
       show()
       color = 3 - color
     }
