@@ -52,7 +52,7 @@
       give (a) {
         this.data.push(a)
       }
-      length () {
+      get length () {
         return this.data.length
       }
     }
@@ -82,6 +82,7 @@
         mapView.appendChild(cell)
       }
     }
+    mapView.children[49 * 100 + 49].style.backgroundColor = 'red'
 
     let mousedown = false
     let clear = false
@@ -107,36 +108,95 @@
     async function path (map, start, end) {
       let table = Object.create(map)
       // let queue = [start] // 所有搜索算法灵魂。queue不同的数据结构，决定不同的算法
-      let queue = new Sorted([start], (a, b) => {
-        let distance1 = (a[0] - end[0]) ** 2 + (a[1] - end[1]) ** 2
-        let distance2 = (b[0] - end[0]) ** 2 + (b[0] - end[1]) ** 2
-        return distance1 - distance2
-      })
+
+      // let queue = new Sorted([start], (a, b) => {
+      //   let distance1 = (a[0] - end[0]) ** 2 + (a[1] - end[1]) ** 2
+      //   let distance2 = (b[0] - end[0]) ** 2 + (b[0] - end[1]) ** 2
+      //   return distance1 - distance2
+      // })
+
+      let queue = new Sorted([start], (a, b) => (distanceEnd(a) - distanceEnd(b)))
+      table[start[1] * 100 + start[0]] = start
+      mapView.children[start[1] * 100 + start[0]].style.backgroundColor = 'lightgreen'
 
       async function insert(x, y, prePoint) {
         if (x < 0 || y < 0 || x >= 100 || y >= 100) {
           return
         }
-        let lastPre
-        if (lastPre = table[y * 100 + x]) { // 注意这里是 y*100 不是x*100
-          // 寻找最佳路径，已到达过的前驱节点不是最佳前驱节点
-          /**
-           * x, y 即将到达的点位置
-           * lastPre 即将到达的点位置，之前的前驱节点
-           * prePoint 本次即将到达点的前驱节点
-           */
-          // let distance1 = (lastPre[0] - start[0]) ** 2 + (lastPre[1] - start[1]) ** 2
-          // let distance2 = (prePoint[0] - end[0]) ** 2 + (prePoint[1] - end[1]) ** 2
-          // if (distance1 < distance2) {
-          //   table[y * 100 + x] = prePoint
-          //   console.log('new pre', lastPre, prePoint)
-          // }
+        let lastPre = table[y * 100 + x]
+        if (table[y * 100 + x]) {
+          console.log('遇到墙~', lastPre, x, y)
           return
         }
-        // await sleep(30)
+        // if (lastPre = table[y * 100 + x]) { // 注意这里是 y*100 不是x*100
+        //   // 寻找最佳路径，已到达过的前驱节点不是最佳前驱节点
+        //   /**
+        //    * x, y 即将到达的点位置
+        //    * lastPre 即将到达的点位置，之前的前驱节点
+        //    * prePoint 本次即将到达点的前驱节点
+        //    */
+        //   // let distance1 = (lastPre[0] - start[0]) ** 2 + (lastPre[1] - start[1]) ** 2
+        //   // let distance2 = (prePoint[0] - start[0]) ** 2 + (prePoint[1] - start[1]) ** 2
+        //   // if (distance1 < distance2) {
+        //   //   table[y * 100 + x] = prePoint
+        //   //   console.log('new pre', lastPre, prePoint)
+        //   // } else {
+        //   // }
+        //   return
+        // }
+        // await sleep(1)
+
+        // 这里要选一个，已到达路径更短的点
+
         mapView.children[y * 100 + x].style.backgroundColor = 'lightgreen'
-        table[y * 100 + x] = prePoint
-        queue.give([x, y])
+        if (lastPre === 0 || distanceStart(lastPre) - distanceStart(prePoint) < 0) {
+          table[y * 100 + x] = prePoint
+          queue.give([x, y])
+        } else {
+          // table[y * 100 + x] = lastPre
+        }
+
+        // if (lastPre === 0) {
+        //   table[y * 100 + x] = prePoint
+        //   queue.give([x, y])
+        // } else {
+        //   if (comparePointPath(lastPre, prePoint)) {
+            
+        //     table[y * 100 + x] = lastPre
+        //   } else {
+        //     table[y * 100 + x] = prePoint
+        //     queue.give([x, y])
+        //   }
+        // }
+
+      }
+
+      function distance (a) {
+        Math.abs()
+        return distanceStart(a) + distanceEnd(a)
+      }
+
+      function distanceStart (a) {
+        return (a[0] - start[0]) ** 2 + (a[1] - start[1]) ** 2
+      }
+
+      function distanceEnd (a) {
+        return (a[0] - end[0]) ** 2 + (a[1] - end[1]) ** 2
+      }
+
+      function comparePointPath (lastPre, pre) {
+        let path1 = findComePath(lastPre[0], lastPre[1])
+        let path2 = findComePath(pre[0], pre[1])
+        return path1 - path2 > 0
+      }
+
+      function findComePath (x, y) {
+        let onePath = []
+        while (x !== start[0] || y !== start[1]) {
+          onePath.push(map[y * 100 + x]);
+          [x, y] = table[y * 100 + x]
+        }
+        return onePath.length
       }
 
       while (queue.length) {
@@ -144,14 +204,13 @@
         // console.log('path ->', x, y)
         if (x === end[0] && y === end[1]) {
           console.log('table:', table, table.length)
-          let onePath = []
+
+          mapView.children[y * 100 + x].style.backgroundColor = 'blue'
+          let onePath = [end]
 
           while (x !== start[0] || y !== start[1]) {
             onePath.push(table[y * 100 + x]); // 此处需要加分号
             [x, y] = table[y * 100 + x]
-            // x = tmp[0]
-            // y = tmp[1]
-            // [x, y] = tmp
             console.log('x, y', table[y * 100 + x], [x, y])
             await sleep(30)
             mapView.children[y * 100 + x].style.backgroundColor = 'blue'
@@ -169,6 +228,9 @@
         await insert(x - 1, y + 1, [x, y])
         await insert(x - 1, y - 1, [x, y])
 
+      }
+      if (queue.length === 0) {
+        console.log('queue 0', table)
       }
       return null
     }
