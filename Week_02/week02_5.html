@@ -144,7 +144,7 @@
         //   // }
         //   return
         // }
-        // await sleep(1)
+        // await sleep(1) pBMqesihk0:u
 
         // 这里要选一个，已到达路径更短的点
 
@@ -163,6 +163,7 @@
           queue.give([x, y])
         } else { // 非第一次到达
           // 比较上一次到达耗费 和 本次到达耗费
+          prePoint[2] += cost
           if (lastPre[2] > prePoint[2]) { // 如果本次耗费更小，则更新 前驱节点 pre
             table[y * 100 + x] = prePoint
           }
