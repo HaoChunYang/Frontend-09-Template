@@ -119,12 +119,12 @@
       table[start[1] * 100 + start[0]] = start
       mapView.children[start[1] * 100 + start[0]].style.backgroundColor = 'lightgreen'
 
-      async function insert(x, y, prePoint) {
+      async function insert(x, y, prePoint, cost) {
         if (x < 0 || y < 0 || x >= 100 || y >= 100) {
           return
         }
         let lastPre = table[y * 100 + x]
-        if (table[y * 100 + x]) {
+        if (table[y * 100 + x] === 1) {
           console.log('遇到墙~', lastPre, x, y)
           return
         }
@@ -149,30 +149,28 @@
         // 这里要选一个，已到达路径更短的点
 
         mapView.children[y * 100 + x].style.backgroundColor = 'lightgreen'
-        if (lastPre === 0 || distanceStart(lastPre) - distanceStart(prePoint) < 0) {
-          table[y * 100 + x] = prePoint
-          queue.give([x, y])
-        } else {
-          // table[y * 100 + x] = lastPre
-        }
-
-        // if (lastPre === 0) {
+        // if (lastPre === 0 || distanceStart(lastPre) - distanceStart(prePoint) < 0) {
         //   table[y * 100 + x] = prePoint
         //   queue.give([x, y])
         // } else {
-        //   if (comparePointPath(lastPre, prePoint)) {
-            
-        //     table[y * 100 + x] = lastPre
-        //   } else {
-        //     table[y * 100 + x] = prePoint
-        //     queue.give([x, y])
-        //   }
+        //   // table[y * 100 + x] = lastPre
         // }
+
+        if (lastPre === 0) { // 第一次到达
+          // let newCost = prePoint[2] + cost
+          prePoint[2] += cost
+          table[y * 100 + x] = prePoint
+          queue.give([x, y])
+        } else { // 非第一次到达
+          // 比较上一次到达耗费 和 本次到达耗费
+          if (lastPre[2] > prePoint[2]) { // 如果本次耗费更小，则更新 前驱节点 pre
+            table[y * 100 + x] = prePoint
+          }
+        }
 
       }
 
       function distance (a) {
-        Math.abs()
         return distanceStart(a) + distanceEnd(a)
       }
 
@@ -218,15 +216,16 @@
           console.log('the path:', onePath)
           return onePath
         }
-        await insert(x - 1, y, [x, y])
-        await insert(x + 1, y, [x, y])
-        await insert(x, y - 1, [x, y])
-        await insert(x, y + 1, [x, y])
+        let oldCost = table[y * 100 + x][2] || 0
+        await insert(x - 1, y, [x, y, oldCost], 10)
+        await insert(x + 1, y, [x, y, oldCost], 10)
+        await insert(x, y - 1, [x, y, oldCost], 10)
+        await insert(x, y + 1, [x, y, oldCost], 10)
 
-        await insert(x + 1, y + 1, [x, y])
-        await insert(x + 1, y - 1, [x, y])
-        await insert(x - 1, y + 1, [x, y])
-        await insert(x - 1, y - 1, [x, y])
+        await insert(x + 1, y + 1, [x, y, oldCost], 14)
+        await insert(x + 1, y - 1, [x, y, oldCost], 14)
+        await insert(x - 1, y + 1, [x, y, oldCost], 14)
+        await insert(x - 1, y - 1, [x, y, oldCost], 14)
 
       }
       if (queue.length === 0) {
