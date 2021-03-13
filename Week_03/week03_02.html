@@ -2,20 +2,42 @@
   let regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g
   let dictionary = ['Number', 'whitespace', 'LineTerminator', '*', '/', '+', '-']
 
-  function tokenize (source) {
+  function* tokenize (source) {
     let result = null
+    let lastIndex = 0
     while (true) {
+      lastIndex = regexp.lastIndex
       result = regexp.exec(source)
       if (!result) {
         break
       }
+      if (regexp.lastIndex - lastIndex > result[0].length) {
+        console.log(regexp.lastIndex, lastIndex, result[0])
+        break
+      }
 
-      for (let i = 0; i < dictionary.length - 1; i++) {
+      let token = {
+        type: null,
+        value: null
+      }
+
+      for (let i = 0; i < dictionary.length; i++) {
         if (result[i + 1]) {
-           console.log(dictionary[i])
+          //  console.log(dictionary[i])
+           token.type = dictionary[i]
         }
       }
-      console.log(result)
+      token.value = result[0]
+      yield token
+      // console.log(result)
+    }
+    yield  {
+      type: 'EOF'
     }
   }
+
+  for (let token of tokenize('5——3')) {
+    console.log(token)
+  }
+
 </script>
