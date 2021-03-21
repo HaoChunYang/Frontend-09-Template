@@ -3,7 +3,10 @@
 ## 文件说明
 
 `week04_01.html` 字典树练习
-`week04_02.html` KMP练习
+
+`week04_02.html` KMP算法练习
+
+`week04_03.html` wildcard算法练习
 
 ## 总论
 
