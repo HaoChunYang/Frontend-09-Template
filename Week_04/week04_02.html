@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function kmp (source, pattern) {
+      // 计算 tab
+      let table = new Array(pattern.length).fill(0)
+      {
+        // 查字符串中有没有自重要
+        let i = 1 // i 要从 1 开始。从 0 开始的话，整个串都是重复的。我理解也就是单个字串的重复进行计算，是没有意义的。
+        let j = 0 // 已重复的字符个数
+  
+        // 写一个循环，从 i 开始计算重复的数字。
+        while (i < pattern.length) {
+          if (pattern[i] === pattern[j]) { // 匹配上的情况
+            ++j, ++i;
+            table[i] = j
+          } else { // 不匹配的时候
+            if (j > 0) { // aabaaac 这种情况。最后一个a
+              j = table[j]
+            } else {
+              ++i;
+            }
+          }
+        }
+        console.log(table)
+        // 对应的数组是，前面字符串匹配上的字符串的个数。
+      }
+
+      // 匹配
+      {
+        let i = j = 0; 
+        // j 认为是 pattern 串的起始位置
+        // i 认为是 source 串的超始位置
+
+        while (i < source.length) {
+          // 匹配上的情况
+          if (pattern[j] === source[i]) {
+            ++i, ++j; // 自增，前进一格
+          } else { // 没有匹配上
+            if (j > 0) {
+              j = table[j]
+            } else { // 当 j = 0 时，source继续进一格
+              ++i;
+            }
+          }
+          // 结束的条件.
+          if (j === pattern.length) { // 自增之后的 j,当匹配到 pattern 尾部时
+            return true
+          } // 进一步优化，计算出匹配到的位置
+
+        }
+        return false // 当 source 串到头没有匹配到
+      }
+    }
+
+    // kmp('', 'abababc') // 0 0 0 1 2 3 4
+    // kmp('', 'abcabce') // 0, 0, 0, 0, 1, 2, 3
+    // kmp('', 'aabaaac') // 0, 0, 1, 0, 1, 2, 2
+    // console.log(kmp('helalo', 'll'))
+    // console.log(kmp('abcabcabcex', 'abcabce'))
+    console.log(kmp('aabaabaaac', 'aabaaac'))
+    console.log(kmp('abcdabcdabcex', 'abcdabce'))
+    console.log(kmp('abcdabce', 'abcdabce'))
+  </script>
+</body>
+</html>
