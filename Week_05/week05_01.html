@@ -1,0 +1,12 @@
+<script>
+  let object = {
+    a: 1,
+    b: 2
+  } // 普通对象
+
+  let po = new Proxy(object, {
+    set (obj, prop, val) { // 三个参数：对象、属性、属性值
+      console.log(obj, prop, val)
+    }
+  })
+</script>

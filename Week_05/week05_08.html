@@ -1,0 +1,93 @@
+<div id="container">
+  PerformanceTiming.domInteractive
+  /en-US/docs/Web/API/PerformanceTiming/domInteractive
+  
+  …Check if you are in one of these cases before using this property as a proxy for the user experience of a Web site's speed…
+  …explaining when you can use this property as a proxy for the user experience of loading a Web site.…
+  
+  PerformanceResourceTiming.nextHopProtocol
+  /en-US/docs/Web/API/PerformanceResourceTiming/nextHopProtocol
+  
+  …When a proxy is used, if a tunnel connection is established, this property returns the ALPN Protocol ID of the tunneled protocol…
+  …Otherwise, this property returns the ALPN Protocol ID of the first hop to the proxy.…
+  
+  HTMLObjectElement.contentWindow
+  /en-US/docs/Web/API/HTMLObjectElement/contentWindow
+  
+  …The contentWindow read-only property of the HTMLObjectElement interface returns a WindowProxy representing the window proxy…
+  
+  image-set()
+  /en-US/docs/Web/CSS/image-set()
+  
+  …Resolution can be used as a proxy for filesize — a user agent on a slow mobile connection with a high-resolution screen may…
+  
+  HTMLIFrameElement
+  /en-US/docs/Web/API/HTMLIFrameElement
+  
+  …HTMLIFrameElement.contentWindow Read only Returns a WindowProxy, the window proxy for the nested browsing context.…
+  
+  CloseEvent
+  /en-US/docs/Web/API/CloseEvent
+  
+  …[Ref] 1014 Bad Gateway The server was acting as a gateway or proxy and received an invalid response from the upstream server…
+  
+</div>
+<div id="dragable" style="display:inline-block ;width: 100px; height: 100px; background-color: peru;"></div>
+
+<script>
+  let dragable = document.getElementById('dragable')
+
+  let baseX = 0, baseY = 0
+
+  dragable.addEventListener('mousedown', function (event) {
+
+    let startX = event.clientX, startY = event.clientY
+    
+    let up = (event) => {
+      baseX = baseX + event.clientX - startX
+      baseY = baseY + event.clientY - startY
+      document.removeEventListener('mousemove', move)
+      document.removeEventListener('mouseup', up)
+    }
+    let move = (event) => {
+      // dragable.style.transform = `translate(${baseX + event.clientX - startX}px, ${baseY + event.clientY - startY}px)`
+
+      let range = getNearest(event.clientX, event.clientY)
+      range.insertNode(dragable)
+    }
+    document.addEventListener('mousemove', move)
+    document.addEventListener('mouseup', up)
+  })
+
+  let ranges = []
+
+  let container = document.getElementById('container')
+  // 找出文字的长度
+  for (let i = 0; i < container.childNodes[0].textContent.length; i++) {
+    let range = document.createRange()
+    range.setStart(container.childNodes[0], i)
+    range.setEnd(container.childNodes[0], i)
+
+    // console.log(range)
+    // console.log(range.getBoundingClientRect())
+    ranges.push(range)
+  }
+
+  function getNearest (x, y) {
+    let min = Infinity
+    let nearest = null
+
+    for (let range of ranges) {
+      let rect = range.getBoundingClientRect()
+      let distance = (rect.x - x) ** 2 + (rect.y - y) ** 2
+      if (distance < min) {
+        min = distance
+        nearest = range
+      }
+    }
+    return nearest
+  }
+
+  // 解除选中事件
+  document.addEventListener('selectstart', event => event.preventDefault())
+</script>

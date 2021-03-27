@@ -1,0 +1,76 @@
+<script>
+  // 6. 不能再用数组，使用 new Map() 存储。
+  // 使用 object 作为一个 key, 查找对应的 reactives
+  let callbacks = new Map() 
+
+  let usedReactivties = [] // 全局使用 reactive 的对象。
+
+  let object = {
+    a: 1,
+    b: 2
+  } // 普通对象
+
+  let po = reactive(object)
+
+  effect(() => {
+    console.log(po.a)
+    // console.log('callback:', data)
+  })
+  
+  function effect (callback) {
+    // callbacks.push(callback)
+    // 1. 清空 usedReactivties
+    usedReactivties = []
+    // 2. 调用 callback，
+    // 如果真的引用了 reactive 对象，它一定会在 get 里面发生注册的行为
+    callback()
+
+    // 4. 可以得到结果了，see~  正确的搜集到了依赖关系
+    console.log(usedReactivties)
+    // 5. 将 usedReactivties 的结果给存起来，可以利用全局的 callbacks
+
+    // 7. 
+    for (let reactivity of usedReactivties) { // reactivity 二元组， 0就是这个对象
+      // 8. reactivity 可能是多次的注册，所以 要防
+      // 设置两层，第一层是对象，第二次是属性。
+      // 第一层
+      if (!callbacks.has(reactivity[0])) { // 如果没有，就加进去
+        callbacks.set(reactivity[0], new Map())
+      }
+      // 第二层
+      if (!callbacks.get(reactivity[0]).has(reactivity[1])) {
+        callbacks.get(reactivity[0]).set(reactivity[1], [])
+      }
+      // 9. 将 callback 存进去
+      callbacks.get(reactivity[0]).get(reactivity[1]).push(callback)
+    }
+    console.log(callbacks)
+  }
+
+  function reactive (object) {
+    return new Proxy(object, {
+      set (obj, prop, val) {
+        console.log('set:', obj, prop, val)
+        obj[prop] = val 
+        // 10. 有索引了，就不需要循环整个 callbacks ,直接找
+        if (callbacks.get(obj)) {
+          if (callbacks.get(obj).get(prop)) {
+            // 有对象，有属性。
+            for (let callback of callbacks.get(obj).get(prop)) {
+              console.log('will callback')
+              callback() // 11. 完毕
+            }
+          }
+        }
+        return obj[prop]
+      },
+      get (obj, prop) {
+        // 3. 注册 usedReactivties 。被调用时，将对象和属性注册进去。
+        // 于是，在 effect 调用之后，就可以知道调用了哪些变量。
+        usedReactivties.push([obj, prop])
+        console.log(usedReactivties)
+        return obj[prop]
+      }
+    })
+  }
+</script>

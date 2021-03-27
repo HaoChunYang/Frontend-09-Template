@@ -1,0 +1,23 @@
+<script>
+  let object = {
+    a: 1,
+    b: 2
+  } // 普通对象
+
+  let po = reactive(object)
+
+  function reactive (object) {
+    // 一般 proxy 的使用，不用直接去 new 一个 Proxy 对象。而且去封装到一个函数里。类似 Promise
+    return new Proxy(object, {
+      set (obj, prop, val) {
+        obj[prop] = val // 如果不设置的话，原 object 的值，是不会发生变化的。
+        console.log(obj, prop, val)
+        return obj[prop] // 这个地方好像不写 return 也可以。老师写了。
+      },
+      get (obj, prop) {
+        console.log(obj, prop)
+        return obj[prop]
+      }
+    })
+  }
+</script>
