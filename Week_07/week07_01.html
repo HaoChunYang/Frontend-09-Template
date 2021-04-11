@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>window Realm</title>
+  <!-- // version >= 3.3 -->
+<script src="https://gw.alipayobjects.com/os/lib/antv/g6/3.5/dist/g6.min.js"></script>
+</head>
+<body>
+  <iframe id="myFrame" src="" frameborder="0"></iframe>
+  <!-- /* 图的画布容器 */ -->
+  <div id="mountNode"></div>
+
+  <!-- /* 引入 G6 */ -->
+  <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.7.1/dist/g6.min.js"></script>
+  <script>
+    // 定义数据源
+    let data = {
+      // 点集
+      nodes: [],
+      // 边集
+      edges: [
+        // 表示一条从 node1 节点连接到 node2 节点的边
+        {
+          source: 'node1',
+          target: 'node2',
+        },
+      ],
+    };
+
+    // 创建 G6 图实例
+    const graph = new G6.Graph({
+      container: 'mountNode', // 指定图画布的容器 id，与第 9 行的容器对应
+      // 画布宽高
+      width: document.body.clientWidth,
+      height: 600,
+      // fitView: true,
+      // fitViewPadding: [20, 40, 50, 20],
+      layout: {
+        // Object，可选，布局的方法及其配置项，默认为 random 布局。
+        type: 'force', // 指定为力导向布局
+        preventOverlap: true, // 防止节点重叠
+        linkDistance: 150, // 设置边长为 100
+        nodeSize: 80        // 节点大小，用于算法中防止节点重叠时的碰撞检测。由于已经在上一节的元素配置中设置了每个节点的 size 属性，则不需要在此设置 nodeSize。
+      },
+      modes: {
+        default: ['drag-canvas', 'zoom-canvas', 'drag-node'], // 允许拖拽画布、放缩画布、拖拽节点
+      },
+    });
+
+    let frameWindow = document.getElementById('myFrame').contentWindow
+    let windowObj = Object.getOwnPropertyNames(frameWindow)
+    let frameObj = Object.getOwnPropertyNames(window)
+    let m = 0
+    let result = []
+    for (const name of windowObj) {
+      // console.log('name:', name)
+      if (Object.hasOwnProperty.call(window, name)) {
+        const item = window[name];
+        if (item !== frameWindow[name]) {
+          // console.log(name, i++)
+          result.push(name)
+        }
+        if (name === 'Array') {
+          console.log(window[name], frameWindow[name])
+        }
+      }
+    }
+    console.log(result)
+    // 删除浏览器中的对象
+    Object.keys(window).forEach(item => {
+      // console.log(item)
+      let i = 0
+      if (i = result.indexOf(item)) {
+        result.splice(i, 1)
+      }
+    })
+    console.log(result)
+
+    for (let i = 0; i < result.length; i++) {
+      const item = result[i];
+      data.nodes.push({id: item, label: item})
+    }
+
+    // 读取数据
+    graph.data(data);
+    // 渲染图
+    graph.render();
+  </script>
+
+</body>
+</html>
