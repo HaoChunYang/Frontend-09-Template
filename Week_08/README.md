@@ -2,6 +2,17 @@
 
 ## 总论
 
+## HTTP请求 - request 格式
+
+`request`格式
+![img](./imgs/request格式.png)
+
+- `\r\n`两个字符组成一个换行符。
+
+设计一个基础库，习惯从他的使用去设计接口。
+
+
+
 ## HTTP请求 - send 函数的编写，了解 response 格式
 
 `response`格式 
