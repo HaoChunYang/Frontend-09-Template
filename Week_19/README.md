@@ -32,8 +32,38 @@ req.end()
 
 ### 流
 
+```js
+// 创建一个文件的流
+let file = fs.createReadStream('./package.json')
+// 监听 data 事件
+file.on('data', chunk => {
+  console.log(chunk.toString())
+})
+// 监听 end 事件
+file.on('end', chunk => {
+  console.log('read finished')
+})
+```
+
 `npm start&` 不会再阻塞console
 
 ## 遇到一个问题。
 
 文件经过 publish-server 服务器发布到 server 上以后，调用一个 publish-server 服务器 http://localhost:8082 浏览器中返回success信息。此时，server上面，刚才成功部署的文件，会变为空文件。
+
+```js
+  req.on('end', () => {
+    res.end('success!')
+  })
+  // 这一段代码生效，并在浏览器中调用时，就会出现上面的问题。
+```
+
+## API
+
+读取文件大小 `fs.stat(path, callback)`
+
+8节，9分多钟好像有鸟叫。哈哈
+
+## 注意
+
+archive.directory('./sample/', false) // 注意这里后面加要一个 / 
